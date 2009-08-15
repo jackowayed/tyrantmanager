@@ -250,7 +250,14 @@ class TyrantManager
       file_pairs << "opts=#{configuration.opts}"
       file_pairs << "mode=#{configuration.mode}"
       Loquacious::Configuration::Iterator.new( configuration.tuning_params ).each do |node|
-        file_pairs << "#{node.name}=#{node.obj}" if node.obj
+        # allow for multiple full-text indices
+        if node.name == 'idx'
+          node.obj.split(',').each do |idx|
+            file_pairs << "idx=#{idx}"
+          end if node.obj
+        else
+          file_pairs << "#{node.name}=#{node.obj}" if node.obj
+        end
       end
 
       file_name_and_params = "#{db_file}##{file_pairs.join("#")}"
